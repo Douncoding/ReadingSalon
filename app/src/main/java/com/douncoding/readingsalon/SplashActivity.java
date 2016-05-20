@@ -16,6 +16,8 @@ public class SplashActivity extends AppCompatActivity {
     GcmBuilder mGcmBuilder;
     InterstitialAd interstitial;
 
+    ContentsInteractor mContentsInteractor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,7 +27,9 @@ public class SplashActivity extends AppCompatActivity {
         mGcmBuilder.setOnListener(new GcmBuilder.OnListener() {
             @Override
             public void onSetup() {
-                showAdMod();
+                //showAdMod();
+                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                finish();
             }
 
             @Override

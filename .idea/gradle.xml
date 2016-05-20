@@ -9,15 +9,19 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/StackBlur" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/greendao-gen" />
+            <option value="$PROJECT_DIR$/mylibrary" />
           </set>
         </option>
         <option name="myModules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/StackBlur" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/greendao-gen" />
+            <option value="$PROJECT_DIR$/mylibrary" />
           </set>
         </option>
       </GradleProjectSettings>
