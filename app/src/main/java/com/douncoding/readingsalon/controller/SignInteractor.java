@@ -39,11 +39,13 @@ public class SignInteractor {
 
     public SignInteractor(Context context) {
         AppContext app = (AppContext)context.getApplicationContext();
+
         mWebService = app.getWebResource().create(WebService.class);
+        owner = new Owner(context);
     }
 
     public interface OnCallback {
-        void onCallback();
+        void onCallback(Object obj);
     }
 
     public void login(String email, String password, final OnCallback listener) {
@@ -57,15 +59,17 @@ public class SignInteractor {
                 }
 
                 owner.store(member);
-
                 if (listener != null) {
-                    listener.onCallback();
+                    listener.onCallback(true);
                 }
             }
 
             @Override
             public void onFailure(Call<Member> call, Throwable t) {
-
+                t.printStackTrace();
+                if (listener != null) {
+                    listener.onCallback(false);
+                }
             }
         });
     }

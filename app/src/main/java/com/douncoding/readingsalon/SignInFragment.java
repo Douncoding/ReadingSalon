@@ -3,6 +3,7 @@ package com.douncoding.readingsalon;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,8 +55,9 @@ public class SignInFragment extends Fragment implements View.OnClickListener {
                 String password = mPassText.getText().toString();
                 mInteractor.login(email, password, new SignInteractor.OnCallback() {
                     @Override
-                    public void onCallback() {
-
+                    public void onCallback(Object obj) {
+                        Boolean result = (Boolean)obj;
+                        Log.d(TAG, "CHECK: 로그인 결과:" + result);
                     }
                 });
                 break;

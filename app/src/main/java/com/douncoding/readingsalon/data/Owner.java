@@ -7,8 +7,7 @@ import com.douncoding.readingsalon.dao.Member;
 
 public class Owner {
     public static final String TAG = Owner.class.getSimpleName();
-
-    public static final String PREFERENCE_NAME = "owner";
+    public static final String PREFERENCE_NAME = "ownerV2";
 
     SharedPreferences mPreferences;
 
@@ -49,7 +48,7 @@ public class Owner {
 
     public void delete() {
         SharedPreferences.Editor editor = mPreferences.edit();
-        editor.putInt("id", 0);
+        editor.putLong("id", 0);
         editor.putString("name", null);
         editor.putString("email", null);
         editor.putInt("writer", 0);

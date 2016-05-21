@@ -1,6 +1,7 @@
 package com.douncoding.readingsalon;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,6 +39,13 @@ public class SplashActivity extends AppCompatActivity {
                 Toast.makeText(SplashActivity.this
                         , "네트워크 상태를 확인하고 다시 시도하세요."
                         , Toast.LENGTH_SHORT).show();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        finish();
+                    }
+                }, 2000);
             }
         });
     }

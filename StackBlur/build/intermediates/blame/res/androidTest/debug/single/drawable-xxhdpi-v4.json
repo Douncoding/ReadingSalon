@@ -1,5 +1,9 @@
 [
     {
+        "merged": "D:\\Documents\\YongWoo\\ReadingSalon\\StackBlur\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-xxhdpi-v4\\ic_launcher.png",
+        "source": "D:\\Documents\\YongWoo\\ReadingSalon\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\drawable-xxhdpi-v4\\ic_launcher.png"
+    },
+    {
         "merged": "C:\\Users\\douncoding\\AndroidStudioProjects\\ReadingSalonV2\\StackBlur\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-xxhdpi-v4\\ic_launcher.png",
         "source": "C:\\Users\\douncoding\\AndroidStudioProjects\\ReadingSalonV2\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\drawable-xxhdpi-v4\\ic_launcher.png"
     }

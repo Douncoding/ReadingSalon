@@ -3,6 +3,8 @@ package com.douncoding.readingsalon;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -13,6 +15,8 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import java.io.IOException;
 
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.PUT;
@@ -32,6 +36,7 @@ public class GcmBuilder {
     public static String TAG = GcmBuilder.class.getSimpleName();
 
     private static final String PROPERTY_REG_ID = "registration_id";
+    private static final String PROPERTY_PUSH_STATE = "state";
     private static final String SENDER_ID = "865257072381";
 
     GoogleCloudMessaging mGcm;
@@ -50,7 +55,7 @@ public class GcmBuilder {
         mAndroidKey = Settings.Secure.getString(
                 context.getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        mApp = (AppContext)context;
+        mApp = (AppContext)context.getApplicationContext();
         mWebService = mApp.getWebResource().create(GcmWebService.class);
 
         if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context)
@@ -60,34 +65,41 @@ public class GcmBuilder {
     }
 
     public void build() {
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, Boolean>() {
             String localKey;
             String serverKey;
 
             @Override
-            protected Void doInBackground(Void... params) {
+            protected Boolean doInBackground(Void... params) {
+                boolean result = true;
+
                 localKey = loadLocalRegistrationKey();
                 serverKey = loadServerRegistrationKey();
 
                 if (localKey.isEmpty()) {
                     Log.d(TAG, "내부키 없음");
-                    publishGoogleServerKey();
+                    result = publishGoogleServerKey();
                 } else {
                     Log.d(TAG, String.format("내부키:%s 서버키:%s", localKey, serverKey));
                     if (!localKey.equals(serverKey)) {
                         Log.w(TAG, "내부키와 서버키 동기화 필요: 재발급");
-                        publishGoogleServerKey();
+                        result = publishGoogleServerKey();
                     }
                 }
-                return null;
+                return result;
             }
 
             @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
 
-                if (onListener != null)
-                    onListener.onSetup();
+                Log.d(TAG, "GCM 인증 상태:" + aBoolean);
+                if (onListener != null) {
+                    if (aBoolean)
+                        onListener.onSetup();
+                    else
+                        onListener.onFailure(null);
+                }
             }
         }.execute();
     }
@@ -116,6 +128,10 @@ public class GcmBuilder {
         int allow;
     }
 
+    /**
+     * 서버가 관리하는 GCM 서비스의 자원을 얻어 기본값을 설정한다.
+     * 기본값은 GCM Key 값과 수신상태 값을 말한다.
+     */
     private String loadServerRegistrationKey() {
         try {
             KeyUnit keyUnit = mWebService.getServerKey(mAndroidKey).execute().body();
@@ -125,12 +141,19 @@ public class GcmBuilder {
                 return "";
             } else {
                 Log.i(TAG, "서버 GCM KEY 얻기:" + keyUnit.gcm);
+                storePushServiceState(keyUnit.allow);
                 return keyUnit.gcm;
             }
         } catch (IOException e) {
             e.printStackTrace();
-            if (onListener != null)
-                onListener.onFailure("loadServerRegistrationKey");
+            if (onListener != null) {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        onListener.onFailure("loadServerRegistrationKey");
+                    }
+                });
+            }
         }
 
         return "";
@@ -146,10 +169,17 @@ public class GcmBuilder {
             Log.i(TAG, "서버 GCM KEY 등록");
         } catch (IOException e) {
             e.printStackTrace();
-            if (onListener != null)
-                onListener.onFailure("storeServerRegistrationKey");
+            if (onListener != null) {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        onListener.onFailure("storeServerRegistrationKey");
+                    }
+                });
+            }
         }
     }
+
 
     private String loadLocalRegistrationKey() {
         String regKey = mPreferences.getString(PROPERTY_REG_ID, "");
@@ -169,7 +199,7 @@ public class GcmBuilder {
         Log.i(TAG, "내부 GCM KEY 저장:" + regKey);
     }
 
-    private void publishGoogleServerKey() {
+    private boolean publishGoogleServerKey() {
         String key;
 
         try {
@@ -177,10 +207,59 @@ public class GcmBuilder {
 
             storeLocalRegistrationKey(key);
             storeServerRegistrationKey(key);
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
-            if (onListener != null)
-                onListener.onFailure("publishGoogleServerKey");
+            return false;
         }
+    }
+
+    public interface OnPushListener {
+        void onChanged();
+    }
+
+    /**
+     * 수신상태 변경
+     */
+    public void changePushState(final boolean state, final OnPushListener listener) {
+        KeyUnit keyUnit = new KeyUnit();
+        keyUnit.deviceId = mAndroidKey;
+        keyUnit.allow = state?1:0;
+
+        mWebService.putServerKey(mAndroidKey, keyUnit).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                storePushServiceState(state?1:0);
+                if (response.code() == 200) {
+                    listener.onChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * 푸쉬 서비스 상태
+     * @return On/Off (1/0)
+     */
+    public boolean isPushServiceOn() {
+        int state = mPreferences.getInt(PROPERTY_PUSH_STATE, 0);
+        Log.i(TAG, "푸쉬수신 상태조회:" + (state == 1?"온":"오프"));
+        return (state == 1);
+    }
+
+    /**
+     * 푸쉬 서비스 수신 여부 설정
+     * @param state 수신 여부
+     */
+    public void storePushServiceState(int state) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putInt(PROPERTY_PUSH_STATE, state);
+        editor.apply();
+        Log.i(TAG, "푸쉬수신 상태설정:" + (state == 1?"온":"오프"));
     }
 }

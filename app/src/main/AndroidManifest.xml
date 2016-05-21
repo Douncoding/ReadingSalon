@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.douncoding.readingsalon"
     android:versionCode="1"
-    android:versionName="1.0.0">
+    android:versionName="1.0">
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
@@ -57,7 +57,8 @@
             android:name=".DetailActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <activity android:name=".ConfigActivity" />
+        <activity android:name=".ConfigActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <activity android:name=".SignActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
