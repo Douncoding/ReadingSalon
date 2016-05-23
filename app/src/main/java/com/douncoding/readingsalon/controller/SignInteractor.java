@@ -4,8 +4,9 @@ import android.content.Context;
 import android.util.Log;
 
 import com.douncoding.readingsalon.AppContext;
-import com.douncoding.readingsalon.dao.Member;
+import com.douncoding.readingsalon.data.Member;
 import com.douncoding.readingsalon.data.Owner;
+import com.google.gson.Gson;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -55,12 +56,10 @@ public class SignInteractor {
                 Member member = response.body();
                 if (member == null) {
                     Log.w(TAG, "로그인 실패: 응답결과 없음");
-                    return;
-                }
-
-                owner.store(member);
-                if (listener != null) {
+                    listener.onCallback(false);
+                } else {
                     listener.onCallback(true);
+                    owner.store(member);
                 }
             }
 
@@ -78,8 +77,33 @@ public class SignInteractor {
         owner.delete();
     }
 
-    public void signup() {
+    public void signup(String name, String email, String password, final OnCallback listener) {
+        Member member = new Member();
+        member.setName(name);
+        member.setEmail(email);
+        member.setPassword(password);
 
+        mWebService.create(member).enqueue(new Callback<Member>() {
+            @Override
+            public void onResponse(Call<Member> call, Response<Member> response) {
+                Member member = response.body();
+                if (member == null) {
+                    Log.w(TAG, "회원가입 실패: 응답결과 없음:" + response.code());
+                    listener.onCallback(false);
+                } else {
+                    Log.i(TAG, "회원가입 성공: " + new Gson().toJson(member));
+                    listener.onCallback(true);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Member> call, Throwable t) {
+                t.printStackTrace();
+                if (listener != null) {
+                    listener.onCallback(false);
+                }
+            }
+        });
     }
 
     public void signdown() {

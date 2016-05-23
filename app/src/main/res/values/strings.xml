@@ -2,6 +2,12 @@
     <string name="app_name">ReadingSalonV2</string>
     <string name="title_activity_main2">Main2Activity</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="planets_prompt">타입 선택</string>
+    <string-array name="planets_array">
+        <item>오늘의 글귀(구분)</item>
+        <item>오늘의 글귀(겹침)</item>
+        <item>서적 추천</item>
+        <item>공지 사항</item>
+    </string-array>
+
 </resources>

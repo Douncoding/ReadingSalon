@@ -42,7 +42,7 @@ public class NoticeFragment extends Fragment {
         mAdapter.setOnItemClickListener(new ContentsAdapter.OnClickListener() {
             @Override
             public void onItemClick(int position, View v) {
-                //Utils.navigateToDetailActivity(getContext(), );
+                Utils.navigateToDetailActivity(getContext(), mAdapter.mDataSet.get(position));
             }
         });
 
@@ -61,7 +61,8 @@ public class NoticeFragment extends Fragment {
         mInteractor.setOnListener(new ContentsInteractor.OnListener() {
             @Override
             public void onLoad(ContentsType type, List<Contents> items) {
-                mAdapter.add(items);
+                if (mAdapter != null)
+                    mAdapter.add(items);
             }
         });
 

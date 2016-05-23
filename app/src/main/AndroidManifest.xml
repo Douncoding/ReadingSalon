@@ -62,6 +62,10 @@
 
         <activity android:name=".SignActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
+
+        <activity android:name=".WriterActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
     </application>
 
 </manifest>

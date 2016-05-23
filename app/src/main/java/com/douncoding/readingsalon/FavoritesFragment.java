@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.douncoding.readingsalon.data.Contents;
+import com.douncoding.readingsalon.data.Owner;
 
 import java.util.List;
 
@@ -64,7 +65,6 @@ public class FavoritesFragment extends Fragment {
             }
         });
 
-
         mInteractor = new ContentsInteractor(getContext().getApplicationContext());
         mInteractor.setOnListener(new ContentsInteractor.OnListener() {
             @Override
@@ -89,11 +89,23 @@ public class FavoritesFragment extends Fragment {
             if (!mApp.mOwner.isLogin()) {
                 Log.d(TAG, "담기 목록 조회: 로그인 필요");
                 Utils.navigateToSignActivity(getContext());
-            } else {
-
             }
-        } else {
-
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (new Owner(getContext()).isLogin()) {
+            mInteractor.load(ContentsType.FAVOR, 0, ContentsInteractor.DEFAULT_LOAD_COUNT);
+        } else {
+            mAdapter.clear();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mAdapter.clear();
     }
 }

@@ -58,7 +58,6 @@ public class CommentsFragment extends Fragment implements View.OnClickListener {
         View rootView = inflater.inflate(R.layout.fragment_comments, container, false);
 
         mEditText = (EditText)rootView.findViewById(R.id.comment_edit);
-        //mExpendedFunc = (ImageView)rootView.findViewById(R.id.comment_expend_func);
         mPostView = (TextView)rootView.findViewById(R.id.comment_post);
         mPostView.setOnClickListener(this);
 
@@ -143,12 +142,14 @@ public class CommentsFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public void onCreated(Comment comment) {
-
+            mEditText.setText("");
+            mAdapter.addItem(comment);
+            mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount());
         }
 
         @Override
         public void onDeleted(Comment comment) {
-
+            mAdapter.delItem(comment);
         }
 
         @Override
@@ -165,11 +166,11 @@ public class CommentsFragment extends Fragment implements View.OnClickListener {
     public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.DataHolder> {
         ArrayList<Comment> mDataset = new ArrayList<>();
 
-        public class DataHolder extends RecyclerView.ViewHolder
-                implements View.OnClickListener {
+        public class DataHolder extends RecyclerView.ViewHolder {
             TextView mNameView;
             TextView mTextView;
             TextView mTimeView;
+            ImageView mCloseView;
 
             public DataHolder(View itemView) {
                 super(itemView);
@@ -177,13 +178,13 @@ public class CommentsFragment extends Fragment implements View.OnClickListener {
                 mNameView = (TextView)itemView.findViewById(R.id.item_comment_name);
                 mTextView = (TextView)itemView.findViewById(R.id.item_comment_text);
                 mTimeView = (TextView)itemView.findViewById(R.id.item_comment_time);
-
-                itemView.setOnClickListener(this);
-            }
-
-            @Override
-            public void onClick(View v) {
-
+                mCloseView = (ImageView)itemView.findViewById(R.id.item_comment_close);
+                mCloseView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mInteractor.remove(mAdapter.get(getPosition()));
+                    }
+                });
             }
         }
 
@@ -202,6 +203,12 @@ public class CommentsFragment extends Fragment implements View.OnClickListener {
             holder.mNameView.setText(comment.getName());
             holder.mTextView.setText(comment.getContent());
             holder.mTimeView.setText(comment.getTime());
+
+            if (comment.getMemberId() != new Owner(getContext()).load().getId()) {
+                holder.mCloseView.setVisibility(View.GONE);
+            } else {
+                holder.mCloseView.setVisibility(View.VISIBLE);
+            }
         }
 
         @Override
@@ -233,6 +240,10 @@ public class CommentsFragment extends Fragment implements View.OnClickListener {
         public void addItems(List<Comment> commentList) {
             mDataset.addAll(commentList);
             notifyDataSetChanged();
+        }
+
+        public Comment get(int position) {
+            return mDataset.get(position);
         }
     }
 }

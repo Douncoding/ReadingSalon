@@ -59,7 +59,8 @@ public class TodayFragment extends Fragment {
         mInteractor.setOnListener(new ContentsInteractor.OnListener() {
             @Override
             public void onLoad(ContentsType type, List<Contents> items) {
-                mAdapter.add(items);
+                if (mAdapter != null)
+                    mAdapter.add(items);
             }
         });
 

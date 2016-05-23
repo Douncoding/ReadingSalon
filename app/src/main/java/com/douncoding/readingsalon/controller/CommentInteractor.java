@@ -6,6 +6,7 @@ import android.util.Log;
 import com.douncoding.readingsalon.AppContext;
 import com.douncoding.readingsalon.ContentsInteractor;
 import com.douncoding.readingsalon.data.Comment;
+import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -102,4 +103,22 @@ public class CommentInteractor {
         });
     }
 
+    public void remove(final Comment comment) {
+        mWebService.delete(comment.getId()).enqueue(new Callback<Comment>() {
+            @Override
+            public void onResponse(Call<Comment> call, Response<Comment> response) {
+                Log.d(TAG, "댓글 삭제 성공: " + new Gson().toJson(comment));
+                if (onListener != null)
+                    onListener.onDeleted(comment);
+            }
+
+            @Override
+            public void onFailure(Call<Comment> call, Throwable t) {
+                Log.d(TAG, "댓글 삭제 실패:");
+                t.printStackTrace();
+                if (onListener != null)
+                    onListener.onError();
+            }
+        });
+    }
 }

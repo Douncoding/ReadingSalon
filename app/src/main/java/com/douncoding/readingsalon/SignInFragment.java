@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.douncoding.readingsalon.controller.SignInteractor;
 
@@ -48,7 +49,7 @@ public class SignInFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.signup_btn:
-
+                ((SignActivity)getActivity()).showSignUpView();
                 break;
             case R.id.signin_btn:
                 String email = mEmailText.getText().toString();
@@ -57,7 +58,16 @@ public class SignInFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void onCallback(Object obj) {
                         Boolean result = (Boolean)obj;
-                        Log.d(TAG, "CHECK: 로그인 결과:" + result);
+                        if (result) {
+                            getActivity().finish();
+                        } else {
+                            mEmailText.setText("");
+                            mPassText.setText("");
+
+                            Toast.makeText(getActivity()
+                                    , "잘못된 계정정보 입니다. 다시 입력하세요."
+                                    , Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
                 break;

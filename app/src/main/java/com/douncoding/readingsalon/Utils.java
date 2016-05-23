@@ -34,8 +34,7 @@ public class Utils {
 
     public static void navigateToWriterActivity(Context context, Contents contents) {
         Intent intent = new Intent(context, WriterActivity.class);
-        intent.putExtra(Constants.WRITER_PARAMS, Constants.WRITER_TYPE_MODIFY);
-        intent.putExtra(Constants.WRITER_DATA_PARAMS, new Gson().toJson(contents));
+        intent.putExtra(WriterActivity.EXTRA_PARAMS, new Gson().toJson(contents));
         context.startActivity(intent);
     }
 

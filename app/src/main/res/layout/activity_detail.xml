@@ -27,6 +27,16 @@
                     android:layout_height="30dp"
                     android:src="@drawable/ic_logo"
                     android:layout_centerInParent="true"/>
+
+                <ImageView
+                    android:id="@+id/post_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_create_black_24dp"
+                    android:tint="@android:color/white"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:paddingEnd="16dp"/>
             </RelativeLayout>
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>

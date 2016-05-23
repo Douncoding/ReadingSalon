@@ -3,8 +3,6 @@ package com.douncoding.readingsalon.data;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.douncoding.readingsalon.dao.Member;
-
 public class Owner {
     public static final String TAG = Owner.class.getSimpleName();
     public static final String PREFERENCE_NAME = "ownerV2";
@@ -16,11 +14,11 @@ public class Owner {
     }
 
     public int getId() {
-        return load().getId().intValue();
+        return load().getId();
     }
 
     public boolean isLogin() {
-        return load().getId().intValue() > 0;
+        return load().getId() > 0;
     }
 
     public boolean isWriter() {
@@ -39,7 +37,7 @@ public class Owner {
     public Member load() {
         Member member = new Member();
 
-        member.setId(mPreferences.getLong("id", 0));
+        member.setId((int)mPreferences.getLong("id", 0));
         member.setName(mPreferences.getString("name", null));
         member.setEmail(mPreferences.getString("email", null));
         member.setWriter(mPreferences.getInt("writer", 0));

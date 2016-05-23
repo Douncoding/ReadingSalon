@@ -17,12 +17,17 @@ public class SignActivity extends AppCompatActivity {
         showSignInView();
     }
 
-    private void showSignInView() {
+    public void showSignInView() {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.sign_view, SignInFragment.newInstance())
                 .commitAllowingStateLoss();
     }
 
-
+    public void showSignUpView() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.sign_view, SignUpFragment.newInstance())
+                .commitAllowingStateLoss();
+    }
 }

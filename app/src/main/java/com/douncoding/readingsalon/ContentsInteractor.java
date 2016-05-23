@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.douncoding.readingsalon.data.Contents;
+import com.douncoding.readingsalon.data.Owner;
 import com.google.gson.Gson;
 
 import java.util.List;
@@ -70,14 +71,8 @@ public class ContentsInteractor {
     }
 
     public interface OnFavorListener {
-        void onLike();
-        void onUnLike();
+        void onReceived(Object obj);
     }
-
-    public void setOnFavorListener(OnFavorListener listener) {
-        this.onFavorListener = listener;
-    }
-
 
     public void load(final ContentsType type, int offset, int limit) {
         Call<List<Contents>> call;
@@ -120,36 +115,38 @@ public class ContentsInteractor {
         });
     }
 
-    public void like(int userId, int contentsId) {
+    public void like(int contentsId, final OnFavorListener listener) {
+        int userId = new Owner(context).getId();
         mWebService.createFavorites(userId, contentsId).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                Log.d(TAG, "모아보기 등록 결과: " + response.code());
-
-                if (onFavorListener != null)
-                    onFavorListener.onLike();
+                Log.d(TAG, "모아보기 등록 성공: " + response.code());
+                listener.onReceived(response.code());
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-
+                Log.d(TAG, "모아보기 등록 실패: ");
+                t.printStackTrace();
+                listener.onReceived(false);
             }
         });
     }
 
-    public void unlike(int userId, int contentsId) {
+    public void unlike(int contentsId, final OnFavorListener listener) {
+        int userId = new Owner(context).getId();
         mWebService.deleteFavorites(userId, contentsId).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                Log.d(TAG, "모아보기 삭제 결과: " + response.code());
-
-                if (onFavorListener != null)
-                    onFavorListener.onUnLike();
+                Log.d(TAG, "모아보기 삭제 성공: " + response.code());
+                listener.onReceived(true);
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-
+                Log.d(TAG, "모아보기 삭제 실패: ");
+                t.printStackTrace();
+                listener.onReceived(false);
             }
         });
     }

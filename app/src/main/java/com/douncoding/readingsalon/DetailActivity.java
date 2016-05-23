@@ -4,14 +4,19 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.douncoding.readingsalon.data.Contents;
+import com.douncoding.readingsalon.data.Owner;
 import com.google.gson.Gson;
 
 import java.util.List;
 
 public class DetailActivity extends AppCompatActivity {
     public static final String TAG = DetailActivity.class.getSimpleName();
+
+    ImageView mPostEdit;
 
     Contents mContents;
     ContentsInteractor mInteractor;
@@ -24,7 +29,14 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
+        mPostEdit = (ImageView)findViewById(R.id.post_edit);
+        mPostEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Utils.navigateToWriterActivity(DetailActivity.this, mContents);
+            }
+        });
 
         String jsonPost = getIntent().getStringExtra("contents");
         mContents = new Gson().fromJson(jsonPost, Contents.class);
@@ -34,6 +46,13 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (new Owner(this).isWriter()) {
+            mPostEdit.setVisibility(View.VISIBLE);
+        } else {
+            mPostEdit.setVisibility(View.GONE);
+        }
+
         mInteractor.getContens(mContents.getId(), new ContentsInteractor.OnDetailListener() {
             @Override
             public void onLoad(Contents contents) {
@@ -49,10 +68,6 @@ public class DetailActivity extends AppCompatActivity {
 
     public interface OnKeyBackPressedListener {
         void onBack();
-    }
-
-    public void setOnKeyBackPressedListener(OnKeyBackPressedListener listener) {
-        this.onKeyBackPressedListener = listener;
     }
 
     public void showPostFragment() {
