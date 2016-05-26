@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
+import com.douncoding.readingsalon.controller.ContentsInteractor;
 import com.douncoding.readingsalon.data.Contents;
 import com.douncoding.readingsalon.data.Owner;
 import com.google.gson.Gson;
@@ -24,6 +25,8 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     public static final String EXTRA_PARAMS = "post";
 
     // 인터페이스
+    TextView mCreatedDate;
+    TextView mUpdatedDate;
     TextView mContentsText;
     TextView mTitleText;
     ImageView mImageView;
@@ -52,9 +55,13 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            String json = getArguments().getString(EXTRA_PARAMS);
+        String json = getArguments().getString(EXTRA_PARAMS);
+        if (json != null) {
+            Log.d(TAG, "포스트 정보:" + json);
             mContents = new Gson().fromJson(json, Contents.class);
+        } else {
+            Log.w(TAG, "포스트 찾을 수 없음:");
+            getActivity().finish();
         }
 
         mOwner = new Owner(getContext());
@@ -67,6 +74,8 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_post, container, false);
 
+        mCreatedDate = (TextView)view.findViewById(R.id.post_created_date);
+        mUpdatedDate = (TextView)view.findViewById(R.id.post_updated_date);
         mContentsText = (TextView)view.findViewById(R.id.detail_content);
         mTitleText = (TextView)view.findViewById(R.id.detail_title);
         mImageView = (ImageView)view.findViewById(R.id.detail_image);
@@ -79,19 +88,13 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         mSharedCountView = (LinearLayout)view.findViewById(R.id.shared_count_view);
         mSharedCountView.setOnClickListener(this);
 
-        mTitleText.setText(mContents.getTitle());
-        mContentsText.setText(mContents.getContent());
-        Glide.with(this)
-                .load(Utils.getServerImage(mContents.getImage()))
-                .placeholder(R.drawable.image_loading_animate)
-                .into(mImageView);
-
+        if (mContents != null) {
+            Glide.with(getContext())
+                    .load(Utils.getServerImage(mContents.getImage()))
+                    .placeholder(R.drawable.image_loading_animate)
+                    .into(mImageView);
+        }
         return view;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
     }
 
     @Override
@@ -99,6 +102,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         super.onResume();
         updatePostStatus();
     }
+
 
     /**
      * 제목, 내용, 이미지는 최소 뷰 생성시 한번만 로딩하지만, 댓글 및 담기 수는 새로고침 시점마다
@@ -108,9 +112,19 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         mInteractor.getContens(mContents.getId(), new ContentsInteractor.OnDetailListener() {
             @Override
             public void onLoad(Contents contents) {
-                mCommentCount.setText(String.valueOf(contents.getCommentCount()));
-                mSharedCount.setText(String.valueOf(contents.getFavoritesCount()));
-                mContents = contents;
+                if (contents == null) {
+                    Log.w(TAG, "포스트 정보를 읽을 수 없음: 서버 정보 없음");
+                    getActivity().finish();
+                } else {
+                    mContents = contents;
+
+                    mCreatedDate.setText(mContents.getCreatedAt());
+                    mUpdatedDate.setText(mContents.getUpdatedAt());
+                    mTitleText.setText(mContents.getTitle());
+                    mContentsText.setText(mContents.getContent());
+                    mCommentCount.setText(String.valueOf(mContents.getCommentCount()));
+                    mSharedCount.setText(String.valueOf(mContents.getFavoritesCount()));
+                }
             }
         });
     }
@@ -124,7 +138,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(MaterialDialog dialog, DialogAction which) {
-                        mInteractor.unlike(mContents.getId(), new ContentsInteractor.OnFavorListener() {
+                        mInteractor.unlike(mContents.getId(), new ContentsInteractor.OnCommonListener() {
                             @Override
                             public void onReceived(Object obj) {
                                 Toast.makeText(getContext()
@@ -145,23 +159,28 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                 ((DetailActivity)getActivity()).showCommentFragment();
                 break;
             case R.id.shared_count_view:
-                mInteractor.like(mContents.getId(), new ContentsInteractor.OnFavorListener() {
-                    @Override
-                    public void onReceived(Object obj) {
-                        Integer code = (Integer)obj;
-                        switch (code) {
-                            case 200:
-                                Toast.makeText(getContext()
-                                        , "모아보기 등록"
-                                        , Toast.LENGTH_SHORT).show();
-                                updatePostStatus();
-                                break;
-                            case 400:
-                                showFavoritesDeleteDialog();
-                                break;
+                if (mOwner.isLogin()) {
+                    mInteractor.like(mContents.getId(), new ContentsInteractor.OnCommonListener() {
+                        @Override
+                        public void onReceived(Object obj) {
+                            Integer code = (Integer) obj;
+                            switch (code) {
+                                case 200:
+                                    Toast.makeText(getContext()
+                                            , "모아보기 등록"
+                                            , Toast.LENGTH_SHORT).show();
+                                    updatePostStatus();
+                                    break;
+                                case 400:
+                                    showFavoritesDeleteDialog();
+                                    break;
+                            }
                         }
-                    }
-                });
+                    });
+                } else {
+                    Utils.showNeedsLoginServiceDialog(getContext());
+                }
+
                 break;
         }
     }

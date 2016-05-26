@@ -10,18 +10,9 @@ public class Constants {
     public static final int NOTIFICATION_GCM_ID = 1;
 
     public static final String WRITER_PARAMS = "com.douncoding.readingsalon.WRITER";
-    public static final String WRITER_DATA_PARAMS = "com.douncoding.readingsalon.WRITER.data";
     public static final String WRITER_TYPE_WRITE = "write";
-    public static final String WRITER_TYPE_DELETE = "delete";
-    public static final String WRITER_TYPE_MODIFY = "modify";
 
-    public static final String EXPENDED_PARAMS = "com.douncoding.readingsalon.EXPENED";
-    public static final String EXPENDED_TYPE_COMMENTS = "comments";
-    public static final String EXPENDED_TYPE_FAVORITES = "favorites";
-    public static final String EXPENDED_TYPE_SHARE = "share";
-
-
-    // Activity
+    // Activit
     public static final int IS_FAVORITES_CHANGE = 100;
     public static final String FAVORITES_CHANGE_KEY = "FAVORITES_DATA_CHANGE";
 }

@@ -67,7 +67,6 @@
             android:id="@+id/post_in"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="작성"
             android:textColor="@android:color/white"
             android:textStyle="bold"
             android:layout_margin="10dp"

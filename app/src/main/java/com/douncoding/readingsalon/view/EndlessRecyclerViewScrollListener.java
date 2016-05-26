@@ -1,4 +1,4 @@
-package com.douncoding.readingsalon;
+package com.douncoding.readingsalon.view;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;

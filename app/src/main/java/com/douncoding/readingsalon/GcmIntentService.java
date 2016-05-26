@@ -27,7 +27,15 @@ public class GcmIntentService extends IntentService {
         if (!extras.isEmpty()) {
             if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
                 Log.i(TAG, "Received: " + extras.toString());
-                sendNotification(extras.getString("key1"), Integer.parseInt(extras.getString("key2")));
+                String key1 = extras.getString("key1");
+                String key2 = extras.getString("key2");
+
+                if (key1 == null || key2 == null) {
+                    Log.w(TAG, "푸쉬 수신: 잘못된 매개변수 수신: ");
+                    return;
+                } else {
+                    sendNotification(key1, Integer.valueOf(key2));
+                }
             }
         }
 
@@ -39,7 +47,7 @@ public class GcmIntentService extends IntentService {
                 = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
         Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra("cid", contentId);
+        intent.putExtra("contents", contentId);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);

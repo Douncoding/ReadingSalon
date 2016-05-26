@@ -110,22 +110,38 @@ public class ContentsAdapter extends RecyclerView.Adapter<ContentsAdapter.DataHo
     }
 
     private void drawDirectImage(String filename, final ImageView view) {
+        String uri;
+
+        if (Utils.isLocalMedia(filename)) {
+            uri = filename;
+        } else {
+            uri = Utils.getServerImage(filename);
+        }
+
         Glide.with(context)
-                .load(Utils.getServerImage(filename))
+                .load(uri)
                 .asBitmap()
                 .placeholder(R.drawable.image_loading_animate)
                 .into(new SimpleTarget<Bitmap>() {
-            @Override
-            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                view.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                view.setImageBitmap(resource);
-            }
-        });
+                    @Override
+                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        view.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                        view.setImageBitmap(resource);
+                    }
+                });
     }
 
     private void drawBlurImage(String filename, final ImageView view) {
+        String uri;
+
+        if (Utils.isLocalMedia(filename)) {
+            uri = filename;
+        } else {
+            uri = Utils.getServerImage(filename);
+        }
+
         Glide.with(context)
-                .load(Utils.getServerImage(filename))
+                .load(uri)
                 .asBitmap()
                 .placeholder(R.drawable.image_loading_animate)
                 .into(new SimpleTarget<Bitmap>() {
@@ -138,8 +154,16 @@ public class ContentsAdapter extends RecyclerView.Adapter<ContentsAdapter.DataHo
     }
 
     private void drawBlindImage(String filename, final ImageView view) {
+        String uri;
+
+        if (Utils.isLocalMedia(filename)) {
+            uri = filename;
+        } else {
+            uri = Utils.getServerImage(filename);
+        }
+
         Glide.with(context)
-                .load(Utils.getServerImage(filename))
+                .load(uri)
                 .asBitmap()
                 .placeholder(R.drawable.image_loading_animate)
                 .into(new SimpleTarget<Bitmap>() {

@@ -11,6 +11,7 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 
@@ -163,6 +164,7 @@ public class GcmBuilder {
         KeyUnit keyUnit = new KeyUnit();
         keyUnit.deviceId = mAndroidKey;
         keyUnit.gcm = regKey;
+        keyUnit.allow = isPushServiceOn()?1:0;
 
         try {
             mWebService.putServerKey(mAndroidKey, keyUnit).execute().body();
@@ -226,6 +228,7 @@ public class GcmBuilder {
         keyUnit.deviceId = mAndroidKey;
         keyUnit.allow = state?1:0;
 
+        Log.d(TAG, "푸쉬 서비스 상태 변경: " + new Gson().toJson(keyUnit));
         mWebService.putServerKey(mAndroidKey, keyUnit).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {

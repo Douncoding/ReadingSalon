@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">ReadingSalonV2</string>
-    <string name="title_activity_main2">Main2Activity</string>
+    <string name="app_name">독서살롱</string>
 
     <string name="planets_prompt">타입 선택</string>
     <string-array name="planets_array">

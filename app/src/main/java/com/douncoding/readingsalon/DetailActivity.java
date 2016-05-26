@@ -7,11 +7,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.douncoding.readingsalon.controller.ContentsInteractor;
 import com.douncoding.readingsalon.data.Contents;
 import com.douncoding.readingsalon.data.Owner;
 import com.google.gson.Gson;
-
-import java.util.List;
 
 public class DetailActivity extends AppCompatActivity {
     public static final String TAG = DetailActivity.class.getSimpleName();
@@ -38,9 +37,23 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
-        String jsonPost = getIntent().getStringExtra("contents");
-        mContents = new Gson().fromJson(jsonPost, Contents.class);
         mInteractor = new ContentsInteractor(this);
+
+        int contentsId = getIntent().getIntExtra("contents", 0);
+        if (contentsId <= 0) {
+            Log.w(TAG, "세부화면 실행 실패: 잘못된 매개변수 ID:" + contentsId);
+            finish();
+        } else {
+            mContents = new Contents();
+            mContents.setId(contentsId);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mContents = null;
+        Log.w(TAG, "onDestroy");
     }
 
     @Override
@@ -56,11 +69,7 @@ public class DetailActivity extends AppCompatActivity {
         mInteractor.getContens(mContents.getId(), new ContentsInteractor.OnDetailListener() {
             @Override
             public void onLoad(Contents contents) {
-                if (contents == null) {
-                    Log.w(TAG, "포스트 세부정보를 읽을 수 없음: 기본정보 대체");
-                } else {
-                    mContents = contents;
-                }
+                mContents = contents;
                 showPostFragment();
             }
         });

@@ -14,6 +14,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
+import com.bumptech.glide.util.Util;
 import com.douncoding.readingsalon.controller.ConfigInteractor;
 import com.douncoding.readingsalon.data.ConfigMenu;
 import com.douncoding.readingsalon.data.Owner;
@@ -106,9 +107,7 @@ public class ConfigMenuFragment extends Fragment {
                         mPersonalMenuView.setVisibility(View.GONE);
                         break;
                     case 1:
-                        Intent intent = new Intent(getActivity(), WriterActivity.class);
-                        intent.putExtra(Constants.WRITER_PARAMS, Constants.WRITER_TYPE_WRITE);
-                        startActivity(intent);
+                        Utils.navigateToWriterActivity(getContext(), null);
                         break;
                 }
             }

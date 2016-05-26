@@ -10,7 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.douncoding.readingsalon.controller.ContentsInteractor;
 import com.douncoding.readingsalon.data.Contents;
+import com.douncoding.readingsalon.view.EndlessRecyclerViewScrollListener;
 
 import java.util.List;
 
@@ -42,7 +44,7 @@ public class NoticeFragment extends Fragment {
         mAdapter.setOnItemClickListener(new ContentsAdapter.OnClickListener() {
             @Override
             public void onItemClick(int position, View v) {
-                Utils.navigateToDetailActivity(getContext(), mAdapter.mDataSet.get(position));
+                Utils.navigateToDetailActivity(getContext(), mAdapter.mDataSet.get(position).getId());
             }
         });
 

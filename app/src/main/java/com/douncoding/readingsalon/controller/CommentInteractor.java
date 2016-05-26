@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.douncoding.readingsalon.AppContext;
-import com.douncoding.readingsalon.ContentsInteractor;
 import com.douncoding.readingsalon.data.Comment;
 import com.google.gson.Gson;
 
